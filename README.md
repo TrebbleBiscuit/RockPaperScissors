@@ -1,2 +1,2 @@
 # RockPaperScissors
-I'm super good a python, guys.
+This is a game of rock paper scissors for python. Shocking, I know.
