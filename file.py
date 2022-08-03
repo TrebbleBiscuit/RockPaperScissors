@@ -6,17 +6,17 @@ from time import sleep
 guess = 4
 print("Let's play rock paper scissors!")
 print("play 1 for rock, 2 for paper, and 3 for scissors.")
-guess = input()
+guess = int(input())
 while guess != 1 and guess != 2 and guess != 3:
     print ("Either pick 1, 2, or 3.")
-    guess = input()
+    guess = int(input())
 if guess == 1:
     name = "rock"
 elif guess == 2:
     name = "paper"
 elif guess == 3:
     name = "scissors"
-print("You chose %s!") % name
+print("You chose %s!" % name)
 sleep(.8)
 opponent = randint(1,3)
 if opponent == 1:
@@ -25,10 +25,10 @@ elif opponent == 2:
     opname = "paper"
 elif opponent == 3:
     opname = "scissors"
-print("I picked %s.") % opname
+print("I picked %s." % opname)
 sleep(.8)
 if opponent == guess:
-    print("We both picked %s.") % name
+    print("We both picked %s." % name)
     print("Tie game!")
 elif opponent == 1 and guess == 2:
    print("Paper covers rock!")
