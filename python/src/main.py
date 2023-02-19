@@ -81,8 +81,8 @@ class RockPaperScissors:
         """Evaluate the winner of a game given the players guesses
 
         Args:
-            guess_1 (int): Function returns True if this player wins
-            guess_2 (int): Functions returns False if this player wins
+            guess_1 (int)
+            guess_2 (int)
 
         Returns:
             int: The number of the player who won (zero for ties)

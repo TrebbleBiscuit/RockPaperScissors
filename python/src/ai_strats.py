@@ -16,6 +16,7 @@ def random(rps: "RockPaperScissors") -> int:
     """Return a random choice"""
     return randint(1, 3)
 
+
 def zhejiang(rps: "RockPaperScissors") -> int:
     """If you lose, switch to beat what the opponent just played.
     If you win, play what the opponent just played.
@@ -24,7 +25,7 @@ def zhejiang(rps: "RockPaperScissors") -> int:
     """
     if rps.last_result == 0:  # tie
         return random(rps)
-    elif rps.last_result == 1:  # win
-        return rps.ai_last_choice
-    elif rps.last_result == 2:  # loss
+    elif rps.last_result == 1:  # human win
         return rps.counter_choice(rps.ai_last_choice)
+    elif rps.last_result == 2:  # human loss
+        return rps.ai_last_choice
