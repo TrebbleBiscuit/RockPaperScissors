@@ -3,61 +3,125 @@ use std::io;
 use std::io::Write;
 
 fn main() {
+    // human_vs_ai_rps_loop()
+    ai_vs_ai_rps_loop()
+}
+
+enum Strats {
+    Zhejiang,
+    Random,
+}
+// todo: specify ome of these in arg?
+
+enum RPSOptions {
+    Rock,
+    Paper,
+    Scissors,
+}
+// todo: use these instead of i32
+
+struct RPSGame {
+    total_ties: i32,
+    total_losses: i32,
+    total_wins: i32,
+    last_p1_guess: i32,
+    last_p2_guess: i32,
+    last_result: i32,
+}
+
+impl RPSGame {
+    fn rps_round(&mut self, human_guess: i32) -> i32 {
+        // return 1 for victory, 0 for tie, -1 for defeat
+        let ai_guess = self.get_ai_guess(self.last_p1_guess, self.last_result, 50);
+        // let ai_guess_name = choice_name(ai_guess);
+        // let guess_name = choice_name(human_guess);
+        // println!("AI chose {ai_guess_name}");
+        // println!("You chose {guess_name}");
+
+        let result: i32;
+        match human_guess - ai_guess {
+            0 => result = 0,
+            -2 => result = 1,
+            -1 => result = -1,
+            1 => result = 1,
+            2 => result = -1,
+            _ => panic!("Invalid guess comparison"),
+        }
+        self.last_result = result;
+        self.last_p1_guess = human_guess;
+        return result;
+    }
+
+    fn get_ai_guess(&self, last_opp_guess: i32, last_result: i32, random_chance: i32) -> i32 {
+        // last_opp_guess is the opposing player's last guess
+        // last result is relative to the opponent i.e. 1 means opponent won
+        // random_chance is between 0 and 100
+        // zhejiang strat 1/3 the time, random 2/3
+        if rand::thread_rng().gen_range(1..=100) <= random_chance {
+            zhejiang(last_opp_guess, last_result)
+        } else {
+            rand::thread_rng().gen_range(1..=3)
+        }
+    }
+}
+
+fn make_rps_game() -> RPSGame {
+    RPSGame {
+        total_ties: 0,
+        total_losses: 0,
+        total_wins: 0,
+        last_p1_guess: rand::thread_rng().gen_range(1..=3),
+        last_p2_guess: rand::thread_rng().gen_range(1..=3),
+        last_result: 0,
+    }
+}
+
+fn human_vs_ai_rps_loop() {
     println!("Let's play rock paper scissors!");
-    let mut total_ties: i32 = 0;
-    let mut total_losses: i32 = 0;
-    let mut total_wins: i32 = 0;
-    let mut last_guess: i32 = rand::thread_rng().gen_range(1..=3);
-    let mut last_result = 0;
+    let mut game = make_rps_game();
     loop {
         let human_guess = solicit_human_guess();
-        last_result = rock_paper_scissors(human_guess, last_guess, last_result);
-        match last_result {
+        println!("AI chose {}", choice_name(game.last_p2_guess));
+        println!("You chose {}", choice_name(game.last_p1_guess));
+        match game.rps_round(human_guess) {
             1 => {
                 println!("You Win!");
-                total_wins += 1
+                game.total_wins += 1
             }
             0 => {
                 println!("It's a Tie!");
-                total_ties += 1
+                game.total_ties += 1
             }
             -1 => {
                 println!("You Lost!");
-                total_losses += 1
+                game.total_losses += 1
             }
             _ => panic!("RPS returned invalid result"),
         }
-        last_guess = human_guess;
-        println!("Record: {total_wins}-{total_losses}-{total_ties}");
+        println!(
+            "Record: {}-{}-{}",
+            game.total_wins, game.total_losses, game.total_ties
+        );
         println!()
     }
 }
 
-fn rock_paper_scissors(human_guess: i32, last_guess: i32, last_result: i32) -> i32 {
-    // Prompt a user for a guess; play RPS vs an "AI"
-    // return 1 for victory, 0 for tie, -1 for defeat
-    let ai_guess = get_ai_guess(last_guess, last_result);
-    let ai_guess_name = choice_name(ai_guess);
-    let guess_name = choice_name(human_guess);
-    println!("AI chose {ai_guess_name}");
-    println!("You chose {guess_name}");
-
-    match human_guess - ai_guess {
-        0 => return 0,
-        -2 => return 1,
-        -1 => return -1,
-        1 => return 1,
-        2 => return -1,
-        _ => panic!("Invalid guess comparison"),
-    }
-}
-
-fn get_ai_guess(last_guess: i32, last_result: i32) -> i32 {
-    // zhejiang strat 1/3 the time, random 2/3
-    if rand::thread_rng().gen_range(1..=3) == 1 {
-        zhejiang(last_guess, last_result)
-    } else {
-        rand::thread_rng().gen_range(1..=3)
+fn ai_vs_ai_rps_loop() {
+    println!("Let's play rock paper scissors!");
+    let mut game = make_rps_game();
+    loop {
+        let ai1_guess = game.get_ai_guess(game.last_p2_guess, -game.last_result, 10);
+        match game.rps_round(ai1_guess) {
+            1 => game.total_wins += 1,
+            0 => game.total_ties += 1,
+            -1 => game.total_losses += 1,
+            _ => panic!("RPS returned invalid result"),
+        }
+        println!(
+            "Record: {}-{}-{}",
+            game.total_wins, game.total_losses, game.total_ties
+        );
+        println!()
     }
 }
 
