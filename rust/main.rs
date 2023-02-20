@@ -1,11 +1,28 @@
 use rand::Rng;
+use std::env;
 use std::io;
 use std::io::Write;
 
 fn main() {
-    play_rps_forever(Strats::Human, Strats::Zhejiang)
+    let args: Vec<String> = env::args().collect();
+    let p1_strat = if args.len() > 1 {
+        match args[1].to_lowercase().as_str() {
+            "random" => Strats::Random,
+            "zhejiang" => Strats::Zhejiang,
+            _ => {
+                println!("Provided argument not recognized; playing as a human");
+                println!("Specify 'random' or 'human' to select p1 strat");
+                Strats::Human
+            }
+        }
+    } else {
+        println!("Playing human vs AI");
+        Strats::Human
+    };
+    play_rps_forever(p1_strat, Strats::Zhejiang)
 }
 
+#[derive(PartialEq)]
 enum Strats {
     Human,
     Zhejiang,
@@ -89,19 +106,22 @@ fn play_rps_forever(p1_strat: Strats, p2_strat: Strats) {
     let mut game = make_rps_game(p1_strat, p2_strat);
     loop {
         let result = game.rps_round();
-        println!("AI chose {}", choice_name(game.last_p2_guess));
-        println!("You chose {}", choice_name(game.last_p1_guess));
-        match result {
-            1 => println!("Player 1 wins!"),
-            0 => println!("It's a tie!"),
-            -1 => println!("Player 2 wins!"),
-            _ => panic!("RPS returned invalid result"),
+        if { game.p1_strat == Strats::Human } || { game.p2_strat == Strats::Human } {
+            // more verbose if there's a human
+            println!();
+            println!("AI chose {}", choice_name(game.last_p2_guess));
+            println!("You chose {}", choice_name(game.last_p1_guess));
+            match result {
+                1 => println!("Player 1 wins!"),
+                0 => println!("It's a tie!"),
+                -1 => println!("Player 2 wins!"),
+                _ => panic!("RPS returned invalid result"),
+            }
         }
         println!(
             "Record: {}-{}-{}",
             game.total_wins, game.total_losses, game.total_ties
         );
-        println!()
     }
 }
 
